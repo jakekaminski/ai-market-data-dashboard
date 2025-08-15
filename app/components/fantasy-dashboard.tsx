@@ -23,7 +23,6 @@ import {
   Users,
 } from "lucide-react";
 import { revalidateTag } from "next/cache";
-import { SearchParams } from "next/dist/server/request/search-params";
 import Filters from "../../components/dashboard/fliters.client";
 import CoachBriefing from "./coach-briefing";
 import WinProbabilityChart from "./win-probability-chart";
@@ -36,7 +35,7 @@ export async function refreshDashboard() {
 export default async function FantasyDashboard({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
   const week = Number(params?.week) || 1;

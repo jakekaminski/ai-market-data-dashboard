@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Market Data Dashboard",
-  description: "See your AI market data in one place",
+  title: "AI Fantasy Coach",
+  description: "Win at all [token] costs.",
 };
 
 export default function RootLayout({
