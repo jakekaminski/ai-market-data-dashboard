@@ -7,24 +7,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TEAM_ID } from "@/lib/espn/fetchers";
 import {
-  Activity,
-  AlarmClockCheck,
   BarChart3,
-  CalendarDays,
   ChartPie,
   ChevronRight,
   LineChart,
   ListChecks,
-  Scale,
-  ShieldAlert,
   Shuffle,
   Table2,
   TrendingUp,
   Users,
 } from "lucide-react";
 import { revalidateTag } from "next/cache";
-import Filters from "../../components/dashboard/fliters.client";
+import Filters from "../../components/dashboard/filters.client";
 import CoachBriefing from "./coach-briefing";
+import MatchupTable from "./matchup-table";
+import ProjectionsChart from "./projections-chart";
 import WinProbabilityChart from "./win-probability-chart";
 
 export async function refreshDashboard() {
@@ -73,33 +70,47 @@ export default async function FantasyDashboard({
 
               {/* Matchup Table */}
               <Section title="Matchups" icon={<Table2 className="h-4 w-4" />}>
-                {/* Replace with your real component */}
-                <Placeholder
-                  height="h-64"
-                  label="<MatchupTable data={fantasyData} />"
-                />
+                <MatchupTable week={week} />
               </Section>
 
-              {/* Scoring Timeline */}
               <Section
-                title="Scoring Timeline"
+                title="Season Projections"
                 icon={<LineChart className="h-4 w-4" />}
               >
-                <Placeholder
-                  height="h-56"
-                  label="Area/Line chart of points over time (mLiveScoring)"
-                />
-              </Section>
+                <Tabs defaultValue="projections">
+                  <TabsList>
+                    <TabsTrigger value="projections" className="gap-2">
+                      <TrendingUp className="h-4 w-4" /> Projections
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="gap-2">
+                      <LineChart className="h-4 w-4" /> History
+                    </TabsTrigger>
+                    <TabsTrigger value="sim" className="gap-2">
+                      <BarChart3 className="h-4 w-4" /> Playoff Sims
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="projections" className="space-y-4 pt-4">
+                    <ProjectionsChart />
+                  </TabsContent>
+                  <TabsContent value="history" className="space-y-4 pt-4">
+                    <Placeholder
+                      height="h-64"
+                      label="Weekly scores line chart per team"
+                    />
+                    <Placeholder height="h-48" label="Head-to-head heatmap" />
+                  </TabsContent>
 
-              {/* Standings / Power Ranking */}
-              <Section
-                title="Standings & Power Rank"
-                icon={<BarChart3 className="h-4 w-4" />}
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Placeholder label="Sortable Standings Table" />
-                  <Placeholder label="Power Ranking Trend (spark line per team)" />
-                </div>
+                  <TabsContent value="sim" className="space-y-4 pt-4">
+                    <Placeholder
+                      height="h-56"
+                      label="Monte Carlo playoff odds"
+                    />
+                    <Placeholder
+                      height="h-48"
+                      label="Likely seeding bar chart"
+                    />
+                  </TabsContent>
+                </Tabs>
               </Section>
             </div>
 
@@ -171,7 +182,7 @@ export default async function FantasyDashboard({
               </Card>
 
               {/* Trade Analyzer */}
-              <Card>
+              {/* <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Scale className="h-4 w-4" /> Trade Analyzer
@@ -188,10 +199,10 @@ export default async function FantasyDashboard({
                     positional depth.
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
 
               {/* Injuries & News */}
-              <Card>
+              {/* <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <ShieldAlert className="h-4 w-4" /> Key Injuries & News
@@ -213,10 +224,10 @@ export default async function FantasyDashboard({
                     </li>
                   </ul>
                 </CardContent>
-              </Card>
+              </Card> */}
 
               {/* Bye Week Planner */}
-              <Card>
+              {/* <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <CalendarDays className="h-4 w-4" /> Bye Week Planner
@@ -233,46 +244,8 @@ export default async function FantasyDashboard({
                     <Placeholder label="AI suggestions" />
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
-          </div>
-
-          {/* Bottom Tabs: Advanced Analytics */}
-          <div className="mt-8">
-            <Tabs defaultValue="history">
-              <TabsList>
-                <TabsTrigger value="history" className="gap-2">
-                  <LineChart className="h-4 w-4" /> History
-                </TabsTrigger>
-                <TabsTrigger value="projections" className="gap-2">
-                  <TrendingUp className="h-4 w-4" /> Projections
-                </TabsTrigger>
-                <TabsTrigger value="sim" className="gap-2">
-                  <BarChart3 className="h-4 w-4" /> Playoff Sims
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="history" className="space-y-4 pt-4">
-                <Placeholder
-                  height="h-64"
-                  label="Weekly scores line chart per team"
-                />
-                <Placeholder height="h-48" label="Head-to-head heatmap" />
-              </TabsContent>
-              <TabsContent value="projections" className="space-y-4 pt-4">
-                <Placeholder
-                  height="h-48"
-                  label="Rest-of-season projections by team/position"
-                />
-                <Placeholder
-                  height="h-48"
-                  label="Boom/Bust variance by player"
-                />
-              </TabsContent>
-              <TabsContent value="sim" className="space-y-4 pt-4">
-                <Placeholder height="h-56" label="Monte Carlo playoff odds" />
-                <Placeholder height="h-48" label="Likely seeding bar chart" />
-              </TabsContent>
-            </Tabs>
           </div>
         </div>
       </div>

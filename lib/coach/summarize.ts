@@ -1,6 +1,7 @@
 "use server";
 
 import { CoachBriefLLMSchema, type CoachBriefLLM } from "@/types/coach.llm";
+import { unstable_cache as unstableCache } from "next/cache";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
@@ -64,7 +65,7 @@ export async function summarizeCoachBrief(brief: {
   try {
     const resp = await openai.responses.parse(
       {
-        model: "gpt-4o-mini", // or "gpt-4o-2024-08-06"
+        model: "gpt-4o-mini",
         temperature: 0,
         input: [
           { role: "system", content: system },
@@ -91,4 +92,51 @@ export async function summarizeCoachBrief(brief: {
   } finally {
     clearTimeout(t);
   }
+}
+
+/**
+ * Cached wrapper around summarizeCoachBrief.
+ * The cache key encodes the inputs so different team/week/risk/live states cache independently.
+ * Re-fetch only happens when you manually call revalidateTag(COACH_BRIEF_TAG) (or the specific per-key tag).
+ */
+export async function getCoachBriefCached(brief: {
+  week: number;
+  teamName: string;
+  opponentName: string;
+  risk: number;
+  live: boolean;
+  startSit: Array<{
+    slot: string;
+    current: { name: string; proj: number; riskAdjProj: number };
+    alternative?: { name: string; proj: number; riskAdjProj: number } | null;
+    delta: number;
+  }>;
+  mismatches: unknown[];
+  streamers: unknown[];
+}): Promise<CoachBriefLLM> {
+  // Build a stable key (no PII if you prefer: hash these fields instead)
+  const keyParts = [
+    "coach-brief",
+    String(brief.week),
+    brief.teamName,
+    brief.opponentName,
+    String(brief.risk),
+    brief.live ? "1" : "0",
+  ];
+
+  // Also emit a specific tag for this key so you CAN revalidate just this one if desired
+  const specificTag = keyParts.join(":");
+
+  const cached = unstableCache(
+    async () => summarizeCoachBrief(brief),
+    keyParts,
+    {
+      // Include a global tag and a specific tag
+      tags: ["coach_brief", specificTag],
+      // No time-based revalidate; manual only
+      revalidate: false,
+    }
+  );
+
+  return cached();
 }

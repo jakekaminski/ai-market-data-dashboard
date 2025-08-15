@@ -44,7 +44,7 @@ export default function Filters({
 
   return (
     <div className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
+      <div className="flex flex-col lg:flex-row mx-auto max-w-7xl px-4 py-3 lg:px-6 gap-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="gap-1">
@@ -89,7 +89,10 @@ export default function Filters({
                 <SelectItem value="any">All Teams</SelectItem>
               </SelectContent>
             </Select>
-
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
             <Tooltip>
               <div className="flex items-center gap-2">
                 <Label
@@ -98,7 +101,7 @@ export default function Filters({
                 >
                   Risk tolerance
                 </Label>
-                <div className="w-40">
+                <div className="w-32 lg:w-40">
                   <TooltipTrigger asChild>
                     <Slider
                       id="risk"
@@ -127,7 +130,8 @@ export default function Filters({
                 Live only
               </Label>
             </div>
-
+          </div>
+          <div className="flex items-center gap-2">
             {refreshAction ? (
               <form action={refreshAction}>
                 <Button

@@ -1,10 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { buildCoachBrief } from "@/lib/coach/buildBrief";
 import { buildImpliedDvpFromProjections } from "@/lib/coach/dvp";
-import { summarizeCoachBrief } from "@/lib/coach/summarize";
+import { getCoachBriefCached } from "@/lib/coach/summarize";
 import { getStaticBundle, getWeeklyBundle } from "@/lib/espn/fetchers";
 import { transformWeeklyToFantasyDTO } from "@/lib/espn/helpers";
-import { Sparkle } from "lucide-react";
+import { RefreshCw, Sparkle } from "lucide-react";
+
+import { revalidateTag } from "next/cache";
+
+export async function refreshCoachBriefs() {
+  "use server";
+  revalidateTag("coach_brief");
+}
 
 export default async function CoachBriefing({
   week,
@@ -63,7 +77,7 @@ export default async function CoachBriefing({
   // Cache key: leagueId + teamId + week + risk + live + hash(deterministic.startSit/mismatches)
   let ai = null;
   try {
-    ai = await summarizeCoachBrief(deterministic);
+    ai = await getCoachBriefCached(deterministic);
   } catch (error: unknown) {
     ai = {
       headline: `AI Summary Unavailable: ${(error as Error).message}`,
@@ -79,14 +93,23 @@ export default async function CoachBriefing({
         <CardTitle className="flex items-center gap-2 text-base">
           <Sparkle className="h-4 w-4" /> AI Coach
         </CardTitle>
+        <CardAction>
+          <form action={refreshCoachBriefs}>
+            <Button type="submit" size="default" variant="outline">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </form>
+        </CardAction>
       </CardHeader>
       <CardContent className="space-y-2">
-        <h2 className="text-lg font-semibold">{ai.headline}</h2>
-        <ul className="list-disc list-inside">
-          {ai.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
-          ))}
-        </ul>
+        <div className="border bg-accent rounded p-4">
+          <h2 className="text-lg font-semibold">{ai.headline}</h2>
+          <ul className="list-disc list-inside">
+            {ai.bullets.map((b, i) => (
+              <li key={i}>{b}</li>
+            ))}
+          </ul>
+        </div>
 
         {/* optional extras */}
         {!!ai.moves?.length && (
