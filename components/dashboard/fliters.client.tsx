@@ -37,10 +37,10 @@ export default function Filters({
     router.replace(`?${next.toString()}`, { scroll: false });
   };
 
-  const week = useSearchParams().get("week");
-  const teamId = useSearchParams().get("team");
-  const risk = useSearchParams().get("risk");
-  const showLiveOnly = useSearchParams().get("live");
+  const week = useSearchParams().get("week") || String(initialWeek || 1);
+  const teamId = useSearchParams().get("team") || initialTeam;
+  const risk = useSearchParams().get("risk") || String(initialRisk || 50);
+  const showLiveOnly = useSearchParams().get("live") || "false";
 
   return (
     <div className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -102,7 +102,7 @@ export default function Filters({
                   <TooltipTrigger asChild>
                     <Slider
                       id="risk"
-                      defaultValue={[initialRisk]}
+                      defaultValue={[Number(risk)]}
                       onValueCommit={(v) =>
                         setParam("risk", String(v[0] ?? 50))
                       }

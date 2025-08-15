@@ -18,8 +18,8 @@ export async function summarizeCoachBrief(brief: {
     alternative?: { name: string; proj: number; riskAdjProj: number } | null;
     delta: number;
   }>;
-  mismatches: any[];
-  streamers: any[];
+  mismatches: unknown[];
+  streamers: unknown[];
 }): Promise<CoachBriefLLM> {
   // Strict system guidance (grounding + style)
   const system = [
@@ -83,8 +83,8 @@ export async function summarizeCoachBrief(brief: {
     const parsed = resp.output_parsed;
     if (!parsed) throw new Error("Structured parse returned null");
     return parsed;
-  } catch (err: any) {
-    if (err?.name === "AbortError") {
+  } catch (err: unknown) {
+    if ((err as Error)?.name === "AbortError") {
       throw new Error("LLM request timed out");
     }
     throw err;

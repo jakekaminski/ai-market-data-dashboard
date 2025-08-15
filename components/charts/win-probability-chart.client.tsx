@@ -94,7 +94,7 @@ export default function WinProbabilityChartClient({
               <LabelList
                 dataKey="home"
                 className="text-left text-lg fill-foreground"
-                formatter={(value: any) => `${value}%`}
+                formatter={(value: unknown) => `${toNum(value)}%`}
               />
             </Bar>
             {/* Right segment (away) with rounded right end */}
@@ -107,7 +107,7 @@ export default function WinProbabilityChartClient({
               <LabelList
                 dataKey="away"
                 className="text-left text-lg fill-foreground"
-                formatter={(value: any) => `${value}%`}
+                formatter={(value: unknown) => `${toNum(value)}%`}
               />
             </Bar>
           </BarChart>

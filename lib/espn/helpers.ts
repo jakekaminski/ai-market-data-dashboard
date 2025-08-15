@@ -1,6 +1,5 @@
 import type {
   FantasyDataDTO,
-  LiveBundle,
   MatchupDTO,
   PlayerCard,
   PlayerStatLine,
@@ -202,96 +201,5 @@ export function transformSeasonToFantasyDTO(
     week: seasonBundle.status?.latestScoringPeriod ?? 1,
     teams,
     matchups: allMatchups,
-  };
-}
-
-/**
- * Normalize live scoring for lightweight widgets.
- * Tries to extract live totals if available; gracefully falls back.
- *
- * @returns an object with per-team live/actual totals you can chart.
- */
-export function transformLiveData(
-  live: LiveBundle,
-  teams: Team[] = []
-): {
-  week: number;
-  teams: Array<{
-    teamId: number;
-    name: string;
-    totalPoints: number;
-    totalPointsLive: number;
-  }>;
-} {
-  const idx = buildTeamIndex(teams);
-  const week = live.scoringPeriodId ?? 0;
-
-  // Some live responses may include schedule-like structures or aggregates.
-  // We'll attempt to read from any schedule in the object; if not present, return empty array with names.
-  const buckets: Record<
-    number,
-    {
-      teamId: number;
-      name: string;
-      totalPoints: number;
-      totalPointsLive: number;
-    }
-  > = {};
-
-  const maybeSchedules: any[] = Array.isArray((live as any).schedule)
-    ? // @ts-ignore
-      (live as any).schedule
-    : [];
-
-  for (const s of maybeSchedules as ScheduleEntry[]) {
-    const pairs: Array<
-      [
-        "home" | "away",
-        number | undefined,
-        number | undefined,
-        number | undefined
-      ]
-    > = [
-      ["home", s.home.teamId, s.home.totalPoints, s.home.totalPointsLive],
-      ["away", s.away.teamId, s.away.totalPoints, s.away.totalPointsLive],
-    ];
-
-    for (const [, teamIdRaw, total, liveTotal] of pairs) {
-      const teamId = typeof teamIdRaw === "number" ? teamIdRaw : -1;
-      if (teamId < 0) continue;
-      const name = teamName(idx[teamId]);
-      const prev = buckets[teamId] ?? {
-        teamId,
-        name,
-        totalPoints: 0,
-        totalPointsLive: 0,
-      };
-      buckets[teamId] = {
-        teamId,
-        name,
-        totalPoints: Math.max(prev.totalPoints, total ?? 0),
-        totalPointsLive: Math.max(
-          prev.totalPointsLive,
-          liveTotal ?? total ?? 0
-        ),
-      };
-    }
-  }
-
-  // If we didn't find anything, at least return the teams list with zeros so charts render.
-  if (Object.keys(buckets).length === 0) {
-    for (const t of teams) {
-      buckets[t.id] = {
-        teamId: t.id,
-        name: teamName(t),
-        totalPoints: 0,
-        totalPointsLive: 0,
-      };
-    }
-  }
-
-  return {
-    week,
-    teams: Object.values(buckets).sort((a, b) => a.teamId - b.teamId),
   };
 }

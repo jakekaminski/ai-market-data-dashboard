@@ -22,7 +22,7 @@ export async function GET(request: Request) {
           },
         })
       : NextResponse.json(data, { headers });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 }

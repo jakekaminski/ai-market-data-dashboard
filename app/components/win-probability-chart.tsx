@@ -7,7 +7,7 @@ import type { FantasyDataDTO, Team } from "@/types/fantasy";
 
 export type WinProbInputs = {
   week?: number; // selected week
-  teamId?: number | null; // selected team (numeric ESPN teamId) or null/"any"
+  teamId?: number | null; // selected team (numeric ESPN teamId) or null
   risk?: number; // 0..100 (risk tolerance from slider)
   live?: boolean; // true => weight projections a bit more (or later, use live totals)
 };

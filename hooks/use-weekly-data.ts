@@ -10,16 +10,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * You can optionally set a polling interval.
  */
 
-type UseWeeklyDataOptions<T = any> = {
+type UseWeeklyDataOptions<T = unknown> = {
   /** Polling interval in ms (0 = no polling). Default: 0 */
   refreshInterval?: number;
   /** Optional transform to map raw API response to a smaller DTO */
-  transformAction?: (raw: any) => T;
+  transformAction?: (raw: unknown) => T;
   /** Abort in-flight request if component unmounts. Default: true */
   abortOnUnmount?: boolean;
 };
 
-type UseWeeklyDataReturn<T = any> = {
+type UseWeeklyDataReturn<T = unknown> = {
   data: T | null;
   isLoading: boolean;
   error: Error | null;
@@ -27,7 +27,7 @@ type UseWeeklyDataReturn<T = any> = {
   lastUpdatedAt: number | null;
 };
 
-export function useWeeklyData<T = any>({
+export function useWeeklyData<T = unknown>({
   refreshInterval = 0,
   transformAction,
   abortOnUnmount = true,
@@ -66,8 +66,8 @@ export function useWeeklyData<T = any>({
       const out = transformAction ? transformAction(json) : (json as T);
       setData(out);
       setLastUpdatedAt(Date.now());
-    } catch (e: any) {
-      if (e?.name === "AbortError") return; // ignore aborts
+    } catch (e: unknown) {
+      if ((e as Error)?.name === "AbortError") return; // ignore aborts
       setError(e instanceof Error ? e : new Error(String(e)));
     } finally {
       setIsLoading(false);

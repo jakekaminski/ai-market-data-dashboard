@@ -8,18 +8,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * start/stop + manual refresh.
  */
 
-type UseLiveDataOptions<T = any> = {
+type UseLiveDataOptions<T = unknown> = {
   /** Polling interval in ms. Default: 15000 */
   refreshInterval?: number;
   /** Optional transform to reduce raw payload to a small DTO */
-  transformAction?: (raw: any) => T;
+  transformAction?: (raw: unknown) => T;
   /** Start polling immediately. Default: true */
   immediate?: boolean;
   /** Abort in-flight request on unmount. Default: true */
   abortOnUnmount?: boolean;
 };
 
-type UseLiveDataReturn<T = any> = {
+type UseLiveDataReturn<T = unknown> = {
   data: T | null;
   isLoading: boolean;
   error: Error | null;
@@ -30,7 +30,7 @@ type UseLiveDataReturn<T = any> = {
   lastUpdatedAt: number | null;
 };
 
-export function useLiveData<T = any>({
+export function useLiveData<T = unknown>({
   refreshInterval = 15000,
   transformAction,
   immediate = true,
@@ -72,8 +72,8 @@ export function useLiveData<T = any>({
       const out = transformAction ? transformAction(json) : (json as T);
       setData(out);
       setLastUpdatedAt(Date.now());
-    } catch (e: any) {
-      if (e?.name === "AbortError") return;
+    } catch (e: unknown) {
+      if ((e as Error)?.name === "AbortError") return;
       setError(e instanceof Error ? e : new Error(String(e)));
     } finally {
       setIsLoading(false);

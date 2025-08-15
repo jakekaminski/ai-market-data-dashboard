@@ -449,7 +449,7 @@ export interface SeasonBundleDTO {
   seasonId: number;
   status: {
     latestScoringPeriod?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   schedule: Array<{
     id: number;

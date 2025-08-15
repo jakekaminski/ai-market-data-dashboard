@@ -11,7 +11,7 @@ export async function GET() {
         "Cache-Control": "public, s-maxage=120, stale-while-revalidate=120",
       },
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 }

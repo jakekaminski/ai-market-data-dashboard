@@ -64,9 +64,9 @@ export default async function CoachBriefing({
   let ai = null;
   try {
     ai = await summarizeCoachBrief(deterministic);
-  } catch (error: any) {
+  } catch (error: unknown) {
     ai = {
-      headline: `AI Summary Unavailable: ${error.message}`,
+      headline: `AI Summary Unavailable: ${(error as Error).message}`,
       bullets: [],
       moves: [],
     };
