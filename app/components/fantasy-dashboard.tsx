@@ -3,18 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TEAM_ID } from "@/lib/espn/fetchers";
 import {
-  BarChart3,
   ChartPie,
   ChevronRight,
   LineChart,
   ListChecks,
   Shuffle,
   Table2,
-  TrendingUp,
   Users,
 } from "lucide-react";
 import { revalidateTag } from "next/cache";
@@ -77,7 +74,8 @@ export default async function FantasyDashboard({
                 title="Season Projections"
                 icon={<LineChart className="h-4 w-4" />}
               >
-                <Tabs defaultValue="projections">
+                <ProjectionsChart />
+                {/* <Tabs defaultValue="projections">
                   <TabsList>
                     <TabsTrigger value="projections" className="gap-2">
                       <TrendingUp className="h-4 w-4" /> Projections
@@ -110,7 +108,7 @@ export default async function FantasyDashboard({
                       label="Likely seeding bar chart"
                     />
                   </TabsContent>
-                </Tabs>
+                </Tabs> */}
               </Section>
             </div>
 
