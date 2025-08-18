@@ -1,23 +1,33 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { buildCoachBrief } from "@/lib/coach/buildBrief";
 import { buildImpliedDvpFromProjections } from "@/lib/coach/dvp";
-import { getCoachBriefCached } from "@/lib/coach/summarize";
+import { summarizeCoachBrief } from "@/lib/coach/summarize";
 import { getStaticBundle, getWeeklyBundle } from "@/lib/espn/fetchers";
 import { transformWeeklyToFantasyDTO } from "@/lib/espn/helpers";
-import { RefreshCw, Sparkle } from "lucide-react";
 
-import { revalidateTag } from "next/cache";
+import { CoachBriefLLM } from "@/types/coach";
+import CoachBriefingClient from "./coach-briefing.client";
 
-export async function refreshCoachBriefs() {
+export async function refreshCoachBriefAction(
+  _prev: { ai: CoachBriefLLM | null; error: string | null },
+  formData: FormData
+): Promise<{ ai: CoachBriefLLM | null; error: string | null }> {
   "use server";
-  revalidateTag("coach_brief");
+  try {
+    const raw = formData.get("deterministic");
+    if (!raw || typeof raw !== "string") {
+      return { ai: null, error: "No input provided" };
+    }
+    const deterministic = JSON.parse(raw);
+    // Call your LLM summarizer; make sure it returns CoachBriefLLM
+    const ai = await summarizeCoachBrief(deterministic);
+    // Validate (optional if summarize already Zod-validates)
+    return { ai, error: null };
+  } catch (e: unknown) {
+    return {
+      ai: null,
+      error: (e as Error).message ?? "Failed to generate coach brief.",
+    };
+  }
 }
 
 export default async function CoachBriefing({
@@ -74,68 +84,11 @@ export default async function CoachBriefing({
     posRatings,
   });
 
-  // Cache key: leagueId + teamId + week + risk + live + hash(deterministic.startSit/mismatches)
-  let ai = null;
-  try {
-    ai = await getCoachBriefCached(deterministic);
-  } catch (error: unknown) {
-    ai = {
-      headline: `AI Summary Unavailable: ${(error as Error).message}`,
-      bullets: [],
-      moves: [],
-    };
-  }
-
   // Render both: AI text up top, then deterministic details collapsible for transparency
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Sparkle className="h-4 w-4" /> AI Coach
-        </CardTitle>
-        <CardAction>
-          <form action={refreshCoachBriefs}>
-            <Button type="submit" size="default" variant="outline">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="border bg-accent rounded p-4">
-          <h2 className="text-lg font-semibold">{ai.headline}</h2>
-          <ul className="list-disc list-inside">
-            {ai.bullets.map((b, i) => (
-              <li key={i}>{b}</li>
-            ))}
-          </ul>
-        </div>
-
-        {/* optional extras */}
-        {!!ai.moves?.length && (
-          <>
-            <div className="mt-3 text-sm font-medium">Suggested Moves</div>
-            <ul className="list-disc list-inside text-sm">
-              {ai.moves.map((m, i) => (
-                <li key={i}>
-                  {m.label}
-                  {m.reason ? ` — ${m.reason}` : ""}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        {/* transparency toggle */}
-        <details className="mt-4">
-          <summary className="cursor-pointer text-xs text-muted-foreground">
-            Show data used
-          </summary>
-          <pre className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-xs">
-            {JSON.stringify(deterministic, null, 2)}
-          </pre>
-        </details>
-      </CardContent>
-    </Card>
+    <CoachBriefingClient
+      deterministicData={deterministic}
+      refreshAction={refreshCoachBriefAction}
+    />
   );
 }
