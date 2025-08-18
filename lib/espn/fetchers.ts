@@ -26,8 +26,7 @@ export async function fetchLeague<T>(views: string[]): Promise<T> {
       "x-fantasy-filter": "{}",
       Cookie: `SWID=${SWID}; espn_s2=${ESPNS2}`,
     },
-    cache: "force-cache",
-    next: { tags: ["dashboard"] },
+    cache: "no-cache",
   });
   if (!res.ok) {
     throw new Error(`Failed to fetch league data: ${res.statusText}`);

@@ -14,17 +14,11 @@ import {
   Table2,
   Users,
 } from "lucide-react";
-import { revalidateTag } from "next/cache";
 import Filters from "../../components/dashboard/filters.client";
 import CoachBriefing from "./coach-briefing";
 import MatchupTable from "./matchup-table";
 import ProjectionsChart from "./projections-chart";
 import WinProbabilityChart from "./win-probability-chart";
-
-export async function refreshDashboard() {
-  "use server";
-  revalidateTag("dashboard");
-}
 
 export default async function FantasyDashboard({
   searchParams,
@@ -45,7 +39,7 @@ export default async function FantasyDashboard({
           initialWeek={1}
           initialTeam="my-team"
           initialRisk={50}
-          refreshAction={refreshDashboard}
+          initialLiveOnly={live}
         />
         {/* Content */}
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">

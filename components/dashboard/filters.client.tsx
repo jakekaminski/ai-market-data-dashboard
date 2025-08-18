@@ -1,8 +1,7 @@
 "use client";
-import { BrainCircuit, RefreshCw } from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { ModeToggle } from "../ui/mode-toggle";
 import {
@@ -21,12 +20,12 @@ export default function Filters({
   initialWeek,
   initialTeam,
   initialRisk,
-  refreshAction,
+  initialLiveOnly = false,
 }: {
   initialWeek: number;
   initialTeam: string;
   initialRisk: number;
-  refreshAction?: (formData: FormData) => Promise<void>;
+  initialLiveOnly?: boolean;
 }) {
   const router = useRouter();
   const sp = useSearchParams();
@@ -40,7 +39,7 @@ export default function Filters({
   const week = useSearchParams().get("week") || String(initialWeek || 1);
   const teamId = useSearchParams().get("team") || initialTeam;
   const risk = useSearchParams().get("risk") || String(initialRisk || 50);
-  const showLiveOnly = useSearchParams().get("live") || "false";
+  const showLiveOnly = useSearchParams().get("live") || String(initialLiveOnly);
 
   return (
     <div className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -124,7 +123,7 @@ export default function Filters({
                 onCheckedChange={(checked) =>
                   setParam("live", checked ? "true" : "false")
                 }
-                defaultChecked={!!showLiveOnly}
+                defaultChecked={showLiveOnly === "true"}
               />
               <Label htmlFor="live" className="text-xs">
                 Live only
@@ -132,28 +131,6 @@ export default function Filters({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {refreshAction ? (
-              <form action={refreshAction}>
-                <Button
-                  type="submit"
-                  size="default"
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <RefreshCw className="h-4 w-4" /> Refresh
-                </Button>
-              </form>
-            ) : (
-              <Button
-                size="default"
-                variant="outline"
-                className="gap-2"
-                disabled
-                onClick={() => router.refresh()}
-              >
-                <RefreshCw className="h-4 w-4" /> Refresh
-              </Button>
-            )}
             <ModeToggle />
           </div>
         </div>
