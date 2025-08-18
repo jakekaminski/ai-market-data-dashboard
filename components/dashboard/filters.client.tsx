@@ -61,7 +61,7 @@ export default function Filters({
               onValueChange={(v) => setParam("week", v)}
               defaultValue={String(initialWeek || 1)}
             >
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="lg:w-[120px]">
                 <SelectValue placeholder="Week" />
               </SelectTrigger>
               <SelectContent>
@@ -78,7 +78,7 @@ export default function Filters({
               defaultValue={initialTeam}
               onValueChange={(v) => setParam("team", v)}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="lg:w-[180px]">
                 <SelectValue placeholder="Select team" />
               </SelectTrigger>
               <SelectContent>
@@ -90,7 +90,7 @@ export default function Filters({
             </Select>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-1 items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Tooltip>
               <div className="flex items-center gap-2">
@@ -130,9 +130,7 @@ export default function Filters({
               </Label>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ModeToggle />
-          </div>
+          <ModeToggle />
         </div>
       </div>
     </div>

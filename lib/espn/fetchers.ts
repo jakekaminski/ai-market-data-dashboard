@@ -35,6 +35,7 @@ export async function fetchLeague<T>(views: string[]): Promise<T> {
 }
 
 export async function getStaticBundle() {
+  "use cache";
   return fetchLeague<StaticBundle>([
     "mSettings",
     "mTeam",
@@ -44,6 +45,7 @@ export async function getStaticBundle() {
 }
 
 export async function getWeeklyBundle() {
+  "use cache";
   return fetchLeague<WeeklyBundle>([
     "mMatchup",
     "mScoreboard",
@@ -52,13 +54,16 @@ export async function getWeeklyBundle() {
 }
 
 export async function getPositionalRatings() {
+  "use cache";
   return fetchLeague<PositionalRatingsBundle>(["mPositionalRatings"]);
 }
 
 export async function getTeam() {
+  "use cache";
   return fetchLeague<TeamsView>(["mTeam"]);
 }
 
 export async function getSeasonBundle() {
+  "use cache";
   return fetchLeague<SeasonBundle>(["mMatchupScore"]);
 }
